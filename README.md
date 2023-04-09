@@ -17,6 +17,8 @@ Serialize noraml data in any struct to string.
   - Indent, organized in struct level.
     Then easy to fold / unfold (expand / collapse) by editor.
   - Index count.
+  - Reference count.
+    Position after source at defination.
   - String in format without escape, that is, what you get is what you see (display by `print`).
 - Support output **configure**, see bellow.
 - Short, write in pure Lua, support 5.3 (easy to migrate to all Lua version)
