@@ -4,16 +4,16 @@ May Lua world become better and better.
 ---
 
 ## Summary
-Serialize noraml data in any struct to string.
+D2S. Serialize noraml Data in any struct to String.
 - "Serialize": convert / store data ..
-- "normal data": support 'nil', 'NaN', 'number' (`math.huge`), 'bool', 'string', 'table', 'funtion' type.
+- "normal data": support 'nil', 'NaN', 'number' (include number from `math`), 'bool', 'string', 'table', 'funtion' type.
 - "in any struct": support table with nest, self-reference, circle-reference (circular-reference).
-- "to string": the output is a normal lua code (string) which could be `load` to unserialize / restore to the data.
+- "to string": the output is a normal lua code (string) which could be `load` to deserialize / restore to the data.
 
 ## Feature
 - Support "**any struct**", described above.
 - **Very fast**, see [Performance](#Performance) bellow.
-  Should be fast to `load` too.
+- Easy to `load`.
 - Support **pretty print** & human **readable** output.
   - Indent, organized in struct level.
     Then easy to fold / unfold (expand / collapse) by editor.
@@ -30,7 +30,7 @@ Serialize noraml data in any struct to string.
 ## Configure
 All have default value.
 - `nil`: default, readable, `load`-able.
-- `'fast'`: will compose (un-readable), `load`-able.
+- `'compress'`: will compose (un-readable), `load`-able.
 - `false`: read only (can't `load`).
   Limitation: currently will fail if there is any self-reference.
 
@@ -54,26 +54,20 @@ All have default value.
 | D2S          | 0.0730          |
 | D2S_compress | 0.0730          |
 
-'penlight' can't restore (`load`) correctly.
-
-Test under windows CMD, test case borrowed from [pkulchenko](https://github.com/pkulchenko)/[serpent](https://github.com/pkulchenko/serpent), iters for 1000.
+Test under windows CMD, test case borrowed from [pkulchenko](https://github.com/pkulchenko)/[serpent](https://github.com/pkulchenko/serpent), iters for 1000.  
+'penlight' can't restore (`load`) correctly with test case.
 
 ## Demo
 - basic (without reference) pretty output
   ```lua
   local t={
-		'a',
-		2,
-		false,
-		true,
-		{
+		'a',2,false,true,
+		{--5
   		0/0,--NaN
 			1/0,--math.huge
-			math.maxinteger,
-			math.mininteger,
-		},--5
-		nil,
-		'b',
+			math.maxinteger,math.mininteger,
+		},
+		nil,'b',
 		D={E={'e',[true]=false,}}
 	}
 	assert(Data2String(t)==[[--Generated using Data2String2.lua by RobertL
@@ -146,8 +140,7 @@ Test under windows CMD, test case borrowed from [pkulchenko](https://github.com/
 
 
 ## Miscellaneous
-The document is not complete. 
-The code has been write for years, comments is poor, I'm not sure every line.
+The code has been write for years, document is not complete.
 Feel free to comment.
 
 Get improved from [pkulchenko/serpent: Lua serializer and pretty printer. (github.com)](https://github.com/pkulchenko/serpent).
