@@ -1,6 +1,7 @@
 local D2S=require'Data2String'
 local Lua_Version=tonumber(string.match(_VERSION,'%d+%.%d'))
 
+local Output
 -- basic (without reference) pretty output
 local t={
 	'a',
@@ -17,7 +18,8 @@ local t={
 	'b',
 	D={E={'e',[true]=false,}}
 }
-assert(D2S(t)==(Lua_Version>=5.3 and [[--Generated using Data2String2.lua by RobertL
+Output=D2S(t)
+assert(Output==(Lua_Version>=5.3 and [[--Generated using Data2String2.lua by RobertL
 return {
 	"a",
 	2,
@@ -53,11 +55,13 @@ return {
 			[true]=false,
 		},
 	},
-}]]))
-assert(D2S(t,'compress')==(Lua_Version>=5.3 and [[--Generated using Data2String2.lua by RobertL
+}]]),Output)
+
+Output=D2S(t,'compress')
+assert(Output==(Lua_Version>=5.3 and [[--Generated using Data2String2.lua by RobertL
 return {"a",2,false,true,{0/0,1/0,math.maxinteger,math.mininteger},[7]="b",D={E={"e",[true]=false}}}]]
 or [[--Generated using Data2String2.lua by RobertL
-return {"a",2,false,true,{0/0,1/0},[7]="b",D={E={"e",[true]=false}}}]]))
+return {"a",2,false,true,{0/0,1/0},[7]="b",D={E={"e",[true]=false}}}]]),Output)
 
 -- self-reference
 local t={}
@@ -82,13 +86,14 @@ local t={
 		['function']="%\t'[[\t]=]",
 	}
 }
-assert(D2S(t)==[===[--Generated using Data2String2.lua by RobertL
+Output=D2S(t)
+assert(Output==[===[--Generated using Data2String2.lua by RobertL
 return {
 	"string",
 	key={
 		[[C:\]],
 		["function"]=[==[%	'[[	]=]]==],
 	},
-}]===])
+}]===],Output)
 
 print"finish"
