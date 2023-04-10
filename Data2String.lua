@@ -40,7 +40,7 @@ local Input_Converter={
 	[true]='true',[false]='false',
 }
 if math.mininteger then
-	Input_Converter[math.mininteger]='math.maxinteger'
+	Input_Converter[math.maxinteger]='math.maxinteger'
 	Input_Converter[math.mininteger]='math.mininteger'
 end
 
