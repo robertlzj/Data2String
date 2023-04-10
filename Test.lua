@@ -1,4 +1,4 @@
-local D2S=require'Data2String2'
+local D2S=require'Data2String'
 local Lua_Version=tonumber(string.match(_VERSION,'%d+%.%d'))
 
 -- basic (without reference) pretty output
@@ -90,3 +90,5 @@ return {
 		["function"]=[==[%	'[[	]=]]==],
 	},
 }]===])
+
+print"finish"

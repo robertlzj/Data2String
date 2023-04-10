@@ -22,8 +22,8 @@ a.c = a -- self-reference
 local Serializer = {
 	serpent = function(...) return require("serpent").dump(...) end,
 	penlight = function(...) return require("pl.pretty").write(...) end,
-	D2S = function(...) return require'Data2String2'(...) end,
-	D2S_compress = function(...) return require'Data2String2'(...,'compress') end,
+	D2S = function(...) return require'Data2String'(...) end,
+	D2S_compress = function(...) return require'Data2String'(...,'compress') end,
 	'serpent','penlight','D2S','D2S_compress',
 }
 
