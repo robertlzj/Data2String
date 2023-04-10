@@ -67,7 +67,8 @@ return {"a",2,false,true,{0/0,1/0},[7]="b",D={E={"e",[true]=false}}}]]),Output)
 local t={}
 t[t]=t
 t.T=t
-local t2=load(D2S(t))()
+Output=D2S(t)
+local t2=assert(load(Output),Output)()
 assert(t2[t2]==t2 and t2.T==t2)
 
 -- circle-reference
@@ -75,7 +76,8 @@ local t1={}
 local t2={}
 t1.T1=t2
 t2.T2=t1
-local t3=load(D2S(t1))()
+Output=D2S(t1)
+local t3=assert(load(Output),Output)()
 assert(t3.T1.T2==t3)
 
 --	string display
