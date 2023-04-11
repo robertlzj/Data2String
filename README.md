@@ -4,7 +4,7 @@ May Lua world become better and better.
 ---
 
 ## Summary
-Serialize data in any struct to string. Clear view through complex reference.
+Serialize data Fast in any struct to string. Clear view through complex reference.
 - "serialize": a serializer support convert / store ..
 - "data": include 'nil', 'NaN', 'number' (also number from `math`), 'bool', 'string', 'table', 'funtion' type.
 - "in any struct": support table with nest, self-reference, circle-reference (circular-reference).
@@ -33,9 +33,10 @@ Serialize data in any struct to string. Clear view through complex reference.
     	_[1],
     }
     ```
+    The threshold value could be specified in [Configure](#Configure).
   - Count for long index.
   - Count for reference.  
-    `--[[2]]` means there are "2" reference of id "1".
+    `--[[2]]` above means there are "2" reference of id "1".
   - Output struct maintain the same with input data.  
     All reference are in right place directly, even when nest.
   - String in format without escape, that is, what you get is what you see as display by `print`.  
@@ -49,7 +50,7 @@ Serialize data in any struct to string. Clear view through complex reference.
 ## Configure
 All have default value.
 - `nil`: default, readable, `load`-able.
-- `'compress'`: will compose (un-readable), `load`-able.
+- `'compress'`: will compose (un-readable), `load`-able, faster.
 - `false`: read only (can't `load`).
   Limitation: currently will fail if there is any self-reference.
 
@@ -113,7 +114,7 @@ Test under windows CMD, test case borrowed from [pkulchenko](https://github.com/
 - compressed:
   ```lua
   assert(Data2String(t,'compress')==[[--Generated using Data2String2.lua by RobertL
-  return {[1]="a",[2]=2,[3]=false,[4]=true,[5]={[1]=0/0,[2]=1/0,[3]=math.maxinteger,[4]=math.mininteger},[7]="b",D={E={[1]="e",[true]=false}}}]])
+  return {"a",2,false,true,{0/0,1/0,math.maxinteger,math.mininteger},[7]="b",D={E={"e",[true]=false}}}]])
   ```
 - string display
   ```lua
