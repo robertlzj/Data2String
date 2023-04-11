@@ -4,26 +4,45 @@ May Lua world become better and better.
 ---
 
 ## Summary
-D2S. Serialize noraml Data in any struct to String.
-- "Serialize": convert / store data ..
-- "normal data": support 'nil', 'NaN', 'number' (include number from `math`), 'bool', 'string', 'table', 'funtion' type.
+Serialize data in any struct to string. Clear view through complex reference.
+- "serialize": a serializer support convert / store ..
+- "data": include 'nil', 'NaN', 'number' (also number from `math`), 'bool', 'string', 'table', 'funtion' type.
 - "in any struct": support table with nest, self-reference, circle-reference (circular-reference).
 - "to string": the output is a normal lua code (string) which could be `load` to deserialize / restore to the data.
+- "clear view": keep the original structure, easy to navigate between references. Expanded bellow.
 
 ## Feature
 - Support "**any struct**", described above.
 - **Very fast**, see [Performance](#Performance) bellow.
-- Easy to `load`.
+- Easy to deserialize / restore / load.
 - Support **pretty print** & human **readable** output.
-  - Indent, organized in struct level.
-    Then easy to fold / unfold (expand / collapse) by editor.
-  - Index count.
-  - Reference count.
-    After source at defination.
-  - String in format without escape, that is, what you get is what you see as display by `print`.
-  - Numerical keys are listed first.
-  - Array part skips keys (`{'a', 'b'}` instead of `{[1] = 'a', [2] = 'b'}`).
-  - Keys use short notation (`{foo = 'foo'}` instead of `{['foo'] = 'foo'}`).
+  - Indent, organized in struct level.  
+    Easy to fold / unfold (expand / collapse) by editor.
+  - Could reuse long string (like other reference object).
+    ```lua
+    --data:
+    {
+    	'string','string',
+    	'long string','long string',
+    }
+    --will get string:
+    {
+      "string",
+    	"string",
+    	_(1,"long string"--[[2]]),
+    	_[1],
+    }
+    ```
+  - Count for long index.
+  - Count for reference.  
+    `--[[2]]` means there are "2" reference of id "1".
+  - Output struct maintain the same with input data.  
+    All reference are in right place directly, even when nest.
+  - String in format without escape, that is, what you get is what you see as display by `print`.  
+    When escape character exist, will use `[[C:\]]` instead of `"C:\\"`. So, you can copy-paste then search in output.
+  - Numerical keys are listed first (`{item1, item2, key=value}`).
+  - Keep array format instead of index-value pairs (`{'data',2,'string'}`).
+  - Use short keys if possible (`{key = 'value', ['do'] = 'end'}`).
 - Support output **configure**, see bellow.
 - Short, write in pure Lua, easy to read, support 5.1, 5.3.
 
@@ -41,12 +60,12 @@ All have default value.
 - `Pairs` (`P`): user / custom `pairs` for iter key value from table.
 
 ## Performance
-| serializer   | time cost (sec) |
-| :----------- | :-------------- |
-| serpent      | 0.4070          |
-| penlight     | 0.3010          |
-| D2S          | 0.2350          |
-| D2S_compress | 0.1840          |
+| serializer                                           | time cost (sec) |
+| :--------------------------------------------------- | :-------------- |
+| [serpent](https://github.com/pkulchenko/serpent)     | 0.4070          |
+| [Penlight](https://github.com/lunarmodules/Penlight) | 0.3010          |
+| D2S                                                  | 0.2350          |
+| D2S_compress                                         | 0.1840          |
 
 | deserializer | time cost (sec) |
 | :----------- | :-------------- |
@@ -114,7 +133,7 @@ Test under windows CMD, test case borrowed from [pkulchenko](https://github.com/
   		["function"]=[==[%	'[[	]=]]==],
   	},
   }]===])
-  ``` 
+  ```
 - self-reference
   ```lua
   local t={}
