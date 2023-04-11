@@ -1,3 +1,4 @@
+print"Data2String performance bench"
 --	modified from [serpent](https://github.com/pkulchenko/serpent/blob/master/t/bench.lua).
 
 local socket=require'socket'
@@ -61,3 +62,5 @@ for index, Serializer_Name in ipairs(Deserializers) do
   print(("deserializer %s (%d): %6.4fs"):format(Serializer_Name, ITERS, get_time() - start))
 	collectgarbage'collect';collectgarbage'collect'
 end
+
+print"finish"
