@@ -115,21 +115,21 @@ local function Data2String(Data,Configure)
 	end
 	
 	--generate ID, clean single instance
-	local ID=1
+	local Candidate_ID=1
 	local tc={--[[
 		[id]=count
 	]]}
 	for t,c in P(Objects) do
 		if c>1 then
-			Objects[t]=ID
-			tc[ID]=c
-			ID=ID+1
+			Objects[t]=Candidate_ID
+			tc[Candidate_ID]=c
+			Candidate_ID=Candidate_ID+1
 		else
 			Objects[t]=nil
 		end
 	end
 
-	local o={--output list
+	local Output_List={
 		'--Generated using Data2String2.lua by RobertL\n',
 		Configure and Next(Objects) and [[local _,Func=setmetatable({},{
 	__index=function(R,id) R[id]={} return R[id] end,
@@ -148,13 +148,13 @@ return ]] or 'return '}
 	local LE--append on line end (comment of index)
 	local Write_Newline=Is_Compress and N or function()
 		if LE then
-			I(o,LE)
+			I(Output_List,LE)
 			LE=nil
 		end
-		return I(o,'\n')
+		return I(Output_List,'\n')
 	end
 	local function Write(text)
-		return I(o,text)
+		return I(Output_List,text)
 	end
 	
 	local Indent=Is_Compress and N or function(Level)
@@ -181,8 +181,8 @@ return ]] or 'return '}
 			local Converted_String,Prefix,Postfix=String_Converter(Input)
 			if Need_Break_Sequent_Open_Bracket then
 				Need_Break_Sequent_Open_Bracket=false
-				if o[#o]=='[' and String_Sub(Prefix or Converted_String,1,1)=='[' then
-					Write' '
+				if Output_List[#Output_List]=='[' and String_Sub(Prefix or Converted_String,1,1)=='[' then
+					Write' '--Break_Between_Key_And_String_Open_Bracket
 				end
 			end
 			if Prefix then
@@ -235,7 +235,7 @@ return ]] or 'return '}
 					end
 				end
 				if Is_Compress then
-					TR(o)--remove last comma
+					TR(Output_List)--remove last comma
 				end
 				Write_Newline()Indent(Indent_Level)Write'}'
 			end
@@ -250,7 +250,7 @@ return ]] or 'return '}
 	end
 	Reference(Data,0)
 	
-	return Concat_Table(o)
+	return Concat_Table(Output_List)
 end--Data2String
 
 return Data2String
