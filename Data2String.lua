@@ -235,7 +235,7 @@ return ]]
 			if Objects[ID] then
 				Write'['Write(ID)Write']'
 				if Is_Key_Delay_Write then
-					Delay_Write'['Delay_Write(ID)Delay_Write']'
+					Delay_Write'=['Delay_Write(ID--[[Value]])Delay_Write']'Delay_Write(Delay_Write_Separator)
 				end
 				return
 			elseif Objects[ID]==false--[[defining]]and Is_Delay_Assign then
@@ -307,7 +307,7 @@ return ]]
 				local Value_ID=Assign_ID(Value)
 				Objects[Value_ID]=false
 				Write'_('Write(Value_ID)Write','
-				Delay_Write'_['Delay_Write(Value_ID)Delay_Write']'Delay_Write(Delay_Write_Separator)
+				Delay_Write'=_['Delay_Write(Value_ID)Delay_Write']'Delay_Write(Delay_Write_Separator)
 			else
 				Output_List_Index_To_Synchronize=#Output_List
 			end
@@ -390,6 +390,15 @@ return ]]
 				local Content=Output_List[Index]
 				Delay_Write(Content)
 			end
+--			if #Output_List>0 then
+--				if not Is_Key_Delay_Write then
+--					Delay_Write'='
+--				end
+--				for Index=Output_List_Index_To_Synchronize,#Output_List do
+--					local Content=Output_List[Index]
+--					Delay_Write(Content)
+--				end
+--			end
 			Delay_Write(Delay_Write_Separator)
 		end
 		local ID=ID or (ID_Enable and Objects[Input])

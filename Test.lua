@@ -153,6 +153,28 @@ Output=D2S(t1,'lazy'
 t3=assert(load(Output),Output)()
 assert(t3.T1.T2==t3 and t3[t3]=='T1')
 
+local t1={}
+local t2={}
+local t3={}
+t1[t1]=t2
+t2[t2]=t3
+t3[t3]=t1
+local Output=D2S(t1)
+--print(Output)
+local t4=assert(load(Output),Output)()
+local t5=t4[t4]
+local t6=t5[t5]
+assert(t6[t6]==t4)
+
+Output=D2S(t1,'lazy'
+	..'compress'
+)
+--print(Output)
+t4=assert(load(Output),Output)()
+t5=t4[t4]
+t6=t5[t5]
+assert(t6[t6]==t4)
+
 --	string display
 local t={
 	'string',
