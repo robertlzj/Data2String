@@ -400,15 +400,6 @@ return ]]
 				local Content=Output_List[Index]
 				Delay_Write(Content)
 			end
---			if #Output_List>0 then
---				if not Is_Key_Delay_Write then
---					Delay_Write'='
---				end
---				for Index=Output_List_Index_To_Synchronize,#Output_List do
---					local Content=Output_List[Index]
---					Delay_Write(Content)
---				end
---			end
 			Delay_Write(Delay_Write_Separator)
 		end
 		local ID=ID or (ID_Enable and Objects[Input])
