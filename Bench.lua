@@ -5,7 +5,7 @@ local socket=require'socket'
 local get_time=socket.gettime
 	and os.clock
 
-local ITERS = 1000
+local ITERS = 50000
 
 ---------- test data  ---------
 local b = {text="ha'ns", ['co\nl or']='bl"ue', str="\"\n'\\\001"}
@@ -23,15 +23,19 @@ a.c = a -- self-reference
 local Serializer = {
 	serpent = function(...) return require("serpent").dump(...) end,
 	penlight = function(...) return require("pl.pretty").write(...) end,
+	leopard = function(...) return require("leopard").Serialize(...) end,
 	D2S = function(...) return require'Data2String'(...) end,
 	D2S_compress = function(...) return require'Data2String'(...,'compress') end,
-	'serpent','penlight','D2S','D2S_compress',
+	D2S_lazy = function(...) return require'Data2String'(...,'lazy') end,
+	D2S_lazy_compress = function(...) return require'Data2String'(...,'lazy compress') end,
+	--'penlight','leopard',
+	'serpent','D2S','D2S_compress','D2S_lazy','D2S_lazy_compress',
 }
 
 for index, serializer_name in ipairs(Serializer) do
 	--load require
 	local serializer=Serializer[serializer_name]
-	serializer()
+	print(serializer_name,'\n',serializer(a))
 end
 
 for index, serializer_name in ipairs(Serializer) do
@@ -45,9 +49,12 @@ end
 --------- deserialize  ---------
 local Deserializers = {
   serpent = load,
+	penlight = load,
 	D2S = load,
 	D2S_compress = load,
-	'serpent','D2S','D2S_compress',
+	D2S_lazy = load,
+	D2S_lazy_compress = load,
+	'serpent','D2S','D2S_compress','D2S_lazy','D2S_lazy_compress',
 }
 
 for index, Serializer_Name in ipairs(Deserializers) do

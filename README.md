@@ -48,39 +48,66 @@ Serialize data Fast in any struct to string. Clear view through complex referenc
 - Short, write in pure Lua, easy to read, support 5.1, 5.3.
 
 ## Configure
-All have default value.
-- `nil`: default, readable, `load`-able.
-- `'compress'`: will compose (un-readable), `load`-able, faster.
-- `false`: read only (can't `load`).
+### Mode
+
+- `nil`: default, most readable, load-able.
+- `'compress'`: will compose (un-readable), load-able, fastest on serialize, slower on deserialize.
+- `lazy`: readable, load-able, balance on serialize and deserialize.
+  could combine `compress`, will become un-readable, but could reduce size.
+- `false`: read only (can't load).
   Limitation: currently will fail if there is any self-reference.
 
-`Configure` could be a table with fields:
+| mode          | readable | serialize speed | deserialize speed |
+| ------------- | -------- | --------------- | ----------------- |
+| default       | 5/5      | 4/5             | 2/5               |
+| compress      | 1/5      | 5/5             | 3/5               |
+| lazy          | 4/5      | 3/5             | 4/5               |
+| lazy compress | 1/5      | 4/5             | 5/5               |
+
+Check [Performance](#Performance).
+
+---
+
+`Configure` could be a table with more fields:
+
+- `Lazy`, `Compress`: set [mode](#mode) if true.
 - `String_Converter` (`SC`): user / custom string converter (wrapper).
 - `Reference_String_If_Longer_Than_Length` (`RS`): number or `false`. If `false` won't reference / re-use any string.
 - `Configure` (`C`): `nil` or `false`. If `false`, "read only" (see above).
 - `Pairs` (`P`): user / custom `pairs` for iter key value from table.
 
 ## Performance
-| serializer                                           | time cost (sec) |
-| :--------------------------------------------------- | :-------------- |
-| [serpent](https://github.com/pkulchenko/serpent)     | 0.4070          |
-| [Penlight](https://github.com/lunarmodules/Penlight) | 0.3010          |
-| D2S                                                  | 0.2350          |
-| D2S_compress                                         | 0.1840          |
+| serializer                                       | time cost (sec) |
+| :----------------------------------------------- | :-------------- |
+| [serpent](https://github.com/pkulchenko/serpent) | 10.03           |
+| D2S                                              | 5.83            |
+| D2S_compress                                     | 4.74            |
+| D2S_lazy                                         | 6.57            |
+| D2S_lazy_compress                                | 5.61            |
 
-| deserializer | time cost (sec) |
-| :----------- | :-------------- |
-| serpent      | 0.0380          |
-| D2S          | 0.0730          |
-| D2S_compress | 0.0730          |
+| deserializer      | time cost (sec) |
+| :---------------- | :-------------- |
+| serpent           | 0.64            |
+| D2S               | 1.44            |
+| D2S_compress      | 1.41            |
+| D2S_lazy          | 0.85            |
+| D2S_lazy_compress | 0.82            |
 
-Test under windows CMD, test case borrowed from [pkulchenko](https://github.com/pkulchenko)/[serpent](https://github.com/pkulchenko/serpent), iters for 1000.  
-'penlight' can't restore (`load`) correctly with test case.
+Test under windows CMD, lua53, test case borrowed from [pkulchenko](https://github.com/pkulchenko)/[serpent](https://github.com/pkulchenko/serpent), iters for 50000.  
+Also test: 
+
+- [Penlight](https://github.com/lunarmodules/Penlight) can't handle self-reference.
+- [NotDSF/leopard](https://github.com/NotDSF/leopard), slow.
+
+## Install
+
+- copy file '[Data2String.lua](https://github.com/robertlzj/Data2String/blob/main/Data2String.lua)' to lua libs.
+- `luarocks install data2string`.
 
 ## Demo
 - basic (without reference) pretty output
   ```lua
-  local t={
+  t={
 		'a',2,false,true,
 		{--5
   		0/0,--NaN
@@ -118,7 +145,7 @@ Test under windows CMD, test case borrowed from [pkulchenko](https://github.com/
   ```
 - string display
   ```lua
-	local t={
+	t={
 		'string',
 		key={
 			"C:\\",
@@ -137,20 +164,25 @@ Test under windows CMD, test case borrowed from [pkulchenko](https://github.com/
   ```
 - self-reference
   ```lua
-  local t={}
+  t={}
 	t[t]=t
 	t.T=t
-	local t2=load(Data2String(t))()
-	assert(t2[t2]==t2 and t2.T==t2)
+	Output=D2S(t)
+	--print(Output)
+  t2=assert(load(Output),Output)()
+  assert(t2[t2]==t2 and t2.T==t2)
   ```
   circle-reference
   ```lua
-  local t1={}
-  local t2={}
+  t1={}
+  t2={}
   t1.T1=t2
   t2.T2=t1
-  local t3=load(Data2String(t1))()
-  assert(t3.T1.T2==t3)
+  t1[t1]='T1'
+  Output=D2S(t1)
+  --print(Output)
+  t3=assert(load(Output),Output)()
+  assert(t3.T1.T2==t3 and t3[t3]=='T1')
   ```
 
 ## Limitations/TODO
