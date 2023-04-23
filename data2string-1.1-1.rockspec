@@ -1,11 +1,12 @@
 package = "Data2String"
-version = "1.0-1"
+version = "1.1-1"
 source = {
-   url = "git+https://github.com/robertlzj/Data2String"
+   url = "git+https://github.com/robertlzj/Data2String",
+   tag = "v1.1",
 }
 description = {
-   summary = "Fast Lua serializer with data in any struct.",
-   detailed = "see README.MD",
+   summary = "Serialize data Fast in any struct to string. Clear view through complex reference.",
+   detailed = "Feature, Configure, Performance, Demo see README.MD",
    homepage = "https://github.com/robertlzj/Data2String",
    license = "GPL-3.0"
 }
