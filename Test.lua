@@ -66,6 +66,30 @@ return {"a",2,false,true,{0/0,1/0,math.maxinteger,math.mininteger},[7]="b",D={E=
 or [[--Generated using Data2String2.lua by RobertL
 return {"a",2,false,true,{0/0,1/0},[7]="b",D={E={"e",[true]=false}}}]]),Output)
 
+Output=D2S(t,'lazy')
+--print(Output)
+assert(string.find(Output,[=[--Generated using Data2String2.lua by RobertL
+return {
+	"a",
+	2,
+	false,
+	true,
+	{--5
+		0/0,
+		1/0,
+		math.maxinteger,
+		math.mininteger,
+	},
+	[7]="b",
+	D={
+		E={
+			"e",
+			[true]=false,
+		},
+	},
+}]=],1,true),Output)
+
+
 --long string reference
 t={
 	'string',
@@ -75,6 +99,21 @@ t={
 Output=D2S(t)
 --print(Output)
 assert(string.find(Output,[=[{
+	"string",
+	"string",
+	_(1,"long string"--[[2]]),
+	_[1],
+}]=],1,true),Output)
+Output=D2S(t,'lazy')
+--print(Output)
+assert(string.find(Output,[=[--Generated using Data2String2.lua by RobertL
+local _,Func=setmetatable({},{
+	__call=function(R,id,t)
+		R[id]=t
+		return t
+	end,
+}),error
+return {
 	"string",
 	"string",
 	_(1,"long string"--[[2]]),
@@ -90,14 +129,29 @@ Output=D2S(t)
 local t2=assert(load(Output),Output)()
 assert(t2[t2]==t2 and t2.T==t2)
 
+Output=D2S(t,'lazy'
+	..'compress'
+)
+--print(Output)
+t2=assert(load(Output),Output)()
+assert(t2[t2]==t2 and t2.T==t2)
+
 -- circle-reference
 local t1={}
 local t2={}
 t1.T1=t2
 t2.T2=t1
+t1[t1]='T1'
 Output=D2S(t1)--print(Output)
 local t3=assert(load(Output),Output)()
-assert(t3.T1.T2==t3)
+assert(t3.T1.T2==t3 and t3[t3]=='T1')
+
+Output=D2S(t1,'lazy'
+	..'compress'
+)
+--print(Output)
+t3=assert(load(Output),Output)()
+assert(t3.T1.T2==t3 and t3[t3]=='T1')
 
 --	string display
 local t={
