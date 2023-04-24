@@ -253,19 +253,18 @@ return ]]
 				if not Is_Key_Delay_Write then
 					Table_ID=Objects[Table]
 					if not Table_ID then
-						assert(not Is_Key_Delay_Write)
+						--assert(not Is_Key_Delay_Write)
 						Table_ID=Assign_ID(Table)
 						Objects[Table_ID]=false
 						local Table_Start_Index=Table_Start_Index_Map[Table]
 						Table_Start_Index_Map[Table]=nil
-						Table_Insert(Output_List,Table_Start_Index,'_('..Table_ID..',')
-						Key_Start_Index=Key_Start_Index and Key_Start_Index+1
-						Key_End_Index=Key_End_Index and Key_End_Index+1
+						--assert(Output_List[Table_Start_Index]=='')
+						Output_List[Table_Start_Index]='_('..Table_ID..','
 					end
 					Delay_Write'_['Delay_Write(Table_ID)Delay_Write']'
 				end
 				if Key~=nil then--value is nest reference
-					assert(Output_List[#Output_List]=='_')
+					--assert(Output_List[#Output_List]=='_')
 					Output_List[#Output_List]='nil--[['..ID..']]'
 					if not Is_Key_Delay_Write then
 						local Key_Type=Get_Type(Key)
@@ -278,16 +277,18 @@ return ]]
 							if Is_Normal and Object_ID_Count[Key_ID] then
 								Object_ID_Count[Key_ID]='?'
 							end
-							Table_Insert(Output_List,Key_Start_Index,'_('..Key_ID..',')
-							Key_End_Index=Key_End_Index+1
-							Table_Insert(Output_List,Key_End_Index,')')
+							--assert(Output_List[Key_Start_Index]=='')
+							Output_List[Key_Start_Index]='_('..Key_ID..','
+							--assert(Output_List[Key_End_Index]=='')
+							Output_List[Key_End_Index]=')'
 							Delay_Write'[_['Delay_Write(Key_ID)Delay_Write']]'
 						elseif not Key_Start_Index--[[index key]] then
 							Delay_Write'['Delay_Write(Key)Delay_Write']'
 						else--key in pairs
 							for Index=Key_Start_Index,Key_End_Index do
 								local Content=Output_List[Index]
-								if String_Sub(Content,1,1)~='[' then
+								local Sub_String=String_Sub(Content,1,1)
+								if Sub_String~='' and Sub_String~='[' then
 									Delay_Write'.'--Table.Key=Value
 								end
 								Delay_Write(Content)
@@ -352,8 +353,8 @@ return ]]
 		elseif Type=='function' then
 			Write(String_Dump(Input))
 		elseif Type=='table' then
+			Write''Table_Start_Index_Map[Input]=#Output_List--Table_Start_Index
 			Write'{'
-			Table_Start_Index_Map[Input]=#Output_List
 			if Next(Input)==nil then
 				Write'}'
 			else
@@ -375,7 +376,7 @@ return ]]
 				for Key,Value in Pairs(Input) do
 					if Index_Set[Key]~=Index_Set then
 						Write_Newline()Indent(Indent_Level+1)
-						Key_Start_Index=#Output_List+1
+						Write''Key_Start_Index=#Output_List
 						local Is_Key_Delay_Write
 						if not (Get_Type(Key)=='string' and (not Configure or (not Keywords[Key] and String_Find(Key,'^[%a_][%w_]*$')))
 							and (Write(Key) or true)) then
@@ -384,7 +385,7 @@ return ]]
 							Is_Key_Delay_Write=Reference(Key,Indent_Level+1,Input)
 							Write']'
 						end
-						Key_End_Index=#Output_List
+						Write''Key_End_Index=#Output_List
 						Write'='Reference(Value,Indent_Level+1,Input,Key,Is_Key_Delay_Write)Write(Comma)
 					end
 				end
