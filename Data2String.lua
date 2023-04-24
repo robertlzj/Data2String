@@ -118,21 +118,42 @@ local function Data2String(Data,Configure)
 		Target_Type=Target_Type or Get_Type(Target)
 		return Target_Type=='table' or (Is_Normal and Target_Type=='string' and RS and String_Length(Target)>RS)
 	end
-	local function Scan(Input)
-		Type=Get_Type(Input)
-		if Is_Could_Define_Reference(Input,Type) then
-			if Objects[Input] then
-				Objects[Input]=Objects[Input]+1
-				assert(Configure or type(Input)~='table',"can't use `false` for configure since there is circle-reference")
-			else
-				Objects[Input]=1
-				if Type=='table' then for k,v in Pairs(Input) do
-					Scan(k);Scan(v)
-				end end
+	local Scan do
+		local Parent_Tables=Is_Delay_Assign and {--[[
+			[Table]=Count,
+		]]}
+		function Scan(Input,Parent_Table,Is_Nest_Reference)
+			Type=Get_Type(Input)
+			if Is_Could_Define_Reference(Input,Type) then
+				if Objects[Input] then
+					if Is_Nest_Reference then
+						Objects[Input]=Objects[Input]+1
+					end
+					assert(Configure or Type~='table',"can't use `false` for configure since there is circle-reference")
+					Objects[Input]=Objects[Input]+1
+					if Is_Delay_Assign and Parent_Tables[Input] and Parent_Tables[Input]>0 then
+						Objects[Parent_Table]=Objects[Parent_Table]+1
+						return 'nest reference'
+					end
+				else
+					Objects[Input]=Is_Nest_Reference and 2 or 1
+					if Type=='table' then
+						if Is_Delay_Assign then
+							Parent_Tables[Input]=(Parent_Tables[Input] or 0)+1
+						end
+						for k,v in Pairs(Input) do
+							local Is_Nest_Reference=Scan(k,Input)
+							Scan(v,Input,Is_Nest_Reference)
+						end
+						if Is_Delay_Assign then
+							Parent_Tables[Input]=Parent_Tables and Parent_Tables[Input]-1
+						end
+					end
+				end
 			end
 		end
-	end
-	Scan(Data)
+		Scan(Data)
+	end--scan
 	if SO then
 		return Objects
 	end
@@ -224,9 +245,6 @@ return ]]
 	end
 	local Need_Break_Sequent_Open_Bracket
 	
-	local Table_Start_Index_Map={--[[
-		[Table]=Start_Index,
-	]]}
 	local Key_Start_Index,Key_End_Index
 	
 	local Tables_Has_Delay_Key={--[[
@@ -252,15 +270,6 @@ return ]]
 				local Table_ID
 				if not Is_Key_Delay_Write then
 					Table_ID=Objects[Table]
-					if not Table_ID then
-						--assert(not Is_Key_Delay_Write)
-						Table_ID=Assign_ID(Table)
-						Objects[Table_ID]=false
-						local Table_Start_Index=Table_Start_Index_Map[Table]
-						Table_Start_Index_Map[Table]=nil
-						--assert(Output_List[Table_Start_Index]=='')
-						Output_List[Table_Start_Index]='_('..Table_ID..','
-					end
 					Delay_Write'_['Delay_Write(Table_ID)Delay_Write']'
 				end
 				if Key~=nil then--value is nest reference
@@ -274,21 +283,13 @@ return ]]
 						elseif Is_Could_Define_Reference(Key,Key_Type) then
 							Key_ID=Assign_ID(Key)
 							Objects[Key_ID]=Key_ID
-							if Is_Normal and Object_ID_Count[Key_ID] then
-								Object_ID_Count[Key_ID]='?'
-							end
-							--assert(Output_List[Key_Start_Index]=='')
-							Output_List[Key_Start_Index]='_('..Key_ID..','
-							--assert(Output_List[Key_End_Index]=='')
-							Output_List[Key_End_Index]=')'
 							Delay_Write'[_['Delay_Write(Key_ID)Delay_Write']]'
 						elseif not Key_Start_Index--[[index key]] then
 							Delay_Write'['Delay_Write(Key)Delay_Write']'
 						else--key in pairs
 							for Index=Key_Start_Index,Key_End_Index do
 								local Content=Output_List[Index]
-								local Sub_String=String_Sub(Content,1,1)
-								if Sub_String~='' and Sub_String~='[' then
+								if String_Sub(Content,1,1)~='[' then
 									Delay_Write'.'--Table.Key=Value
 								end
 								Delay_Write(Content)
@@ -353,7 +354,6 @@ return ]]
 		elseif Type=='function' then
 			Write(String_Dump(Input))
 		elseif Type=='table' then
-			Write''Table_Start_Index_Map[Input]=#Output_List--Table_Start_Index
 			Write'{'
 			if Next(Input)==nil then
 				Write'}'
@@ -376,7 +376,7 @@ return ]]
 				for Key,Value in Pairs(Input) do
 					if Index_Set[Key]~=Index_Set then
 						Write_Newline()Indent(Indent_Level+1)
-						Write''Key_Start_Index=#Output_List
+						Key_Start_Index=#Output_List+1
 						local Is_Key_Delay_Write
 						if not (Get_Type(Key)=='string' and (not Configure or (not Keywords[Key] and String_Find(Key,'^[%a_][%w_]*$')))
 							and (Write(Key) or true)) then
@@ -385,7 +385,7 @@ return ]]
 							Is_Key_Delay_Write=Reference(Key,Indent_Level+1,Input)
 							Write']'
 						end
-						Write''Key_End_Index=#Output_List
+						Key_End_Index=#Output_List
 						Write'='Reference(Value,Indent_Level+1,Input,Key,Is_Key_Delay_Write)Write(Comma)
 					end
 				end
@@ -406,12 +406,11 @@ return ]]
 		local ID=ID or (ID_Enable and Objects[Input])
 		--	`Input` may be referenced as `Table`, when exist nest reference (from child to parent)
 		if ID then
-			if Is_Normal and Object_ID_Count[ID] then
+			if Is_Normal then
 				Write'--[['Write(Object_ID_Count[ID])Write']]'--Reference Count
 			end
 			Write')'
 			Objects[ID]=ID
-			
 		end
 		if not Is_Compress then
 			local Table_ID=Tables_Has_Delay_Key[Table]
