@@ -186,8 +186,16 @@ Also test:
   ```
 
 ## Limitations/TODO
+- interpreter compile error when `load`, if too many table member in nest table.
+
+  - "function or expression needs too many registers near '..'", in lua5.34
+    there are 248 registers in stack.
+
+  - "function or expression too complex near '...'", in lua5.14
+
+  see [Everything You Didn’t Want to Know About Lua’s Multi-Values - Benaiah Mischenko](https://benaiah.me/posts/everything-you-didnt-want-to-know-about-lua-multivals/).
 - doesn't support metatable, could be done.
-- doesn't support external data, could be done.
+- doesn't support external data import, could be done.
 - Lua 5.2 test didn't all pass, not sure why.
 
 
