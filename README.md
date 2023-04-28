@@ -47,7 +47,7 @@ Serialize data Fast in any struct to string. Clear view through complex referenc
 - Support output **configure**, see bellow.
 - Short, write in pure Lua, easy to read, support 5.1, 5.3.
 - Workaround registers max count limitation used in function or expression when load.   
-  See Limitations/TODO-[#Done].
+  See [Limitations/TODO](#Limitations/TODO).
 
 ## Configure
 ### Mode
