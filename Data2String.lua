@@ -426,7 +426,7 @@ return ]]
 						for Key,Value in Pairs(Input) do--simulate ipairs
 							Type=Get_Type(Key)
 							if Type=='number' then
-								if Index_Length and Key>Index_Length then
+								if Value~=Value//1 or (Index_Length and Key>Index_Length) then
 									Table_Insert(Number_Key_List,Key)
 								end
 							elseif Type=='string' then
