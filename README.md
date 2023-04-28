@@ -27,7 +27,7 @@ Serialize data Fast in any struct to string. Clear view through complex referenc
     }
     --will get string:
     {
-      "string",
+    	"string",
     	"string",
     	_(1,"long string"--[[2]]),
     	_[1],
@@ -47,7 +47,7 @@ Serialize data Fast in any struct to string. Clear view through complex referenc
 - Support output **configure**, see bellow.
 - Short, write in pure Lua, easy to read, support 5.1, 5.3.
 - Workaround registers max count limitation used in function or expression when load.   
-  See Limitations/TODO-[[#Done]].
+  See Limitations/TODO-[#Done].
 
 ## Configure
 ### Mode
@@ -107,6 +107,9 @@ Also test:
 - `luarocks install data2string`.
 
 ## Demo
+
+see 'Test.lua'
+
 - basic (without reference) pretty output
   ```lua
   t={
@@ -121,16 +124,6 @@ Also test:
 	}
 	assert(Data2String(t)==[[--Generated using Data2String2.lua by RobertL
   return {
-  	"a",
-  	2,
-  	false,
-  	true,
-  	{--5
-    	0/0,
-  		1/0,
-  		math.maxinteger,
-  		math.mininteger,
-  	},
   	[7]="b",
   	D={
   		E={
@@ -138,12 +131,22 @@ Also test:
   			[true]=false,
   		},
   	},
+      "a",
+  	2,
+  	false,
+  	true,
+  	{--5
+  		0/0,
+  		1/0,
+  		math.maxinteger,
+  		math.mininteger,
+  	},
   }]])
   ```
 - compressed:
   ```lua
   assert(Data2String(t,'compress')==[[--Generated using Data2String2.lua by RobertL
-  return {"a",2,false,true,{0/0,1/0,math.maxinteger,math.mininteger},[7]="b",D={E={"e",[true]=false}}}]])
+  return {[7]="b",D={E={"e",[true]=false}},"a",2,false,true,{0/0,1/0,math.maxinteger,math.mininteger}}]])
   ```
 - string display
   ```lua
