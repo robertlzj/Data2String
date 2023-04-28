@@ -5,7 +5,8 @@ local socket=require'socket'
 local get_time=socket.gettime
 	and os.clock
 
-local ITERS = 50000
+local ITERS = ... or 50000
+print("ITERS",ITERS)
 
 ---------- test data  ---------
 local b = {text="ha'ns", ['co\nl or']='bl"ue', str="\"\n'\\\001"}
