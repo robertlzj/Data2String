@@ -414,11 +414,11 @@ return ]]
 						if Input[true]~=nil then
 							Table_Insert(Bool_Key_List,true)
 						end
-						local Index_Length do--exclude hole
+						local Max_Index do--exclude hole
 							for Index=1,#Input do
 								local Value=Input[Index]
 								if Value==nil then
-									Index_Length=Index-1
+									Max_Index=Index-1
 									break
 								end
 							end
@@ -426,7 +426,7 @@ return ]]
 						for Key,Value in Pairs(Input) do--simulate ipairs
 							Type=Get_Type(Key)
 							if Type=='number' then
-								if Value~=Value//1 or (Index_Length and Key>Index_Length) then
+								if not Max_Index or Key~=Key//1 or Key<1 or Key>Max_Index then
 									Table_Insert(Number_Key_List,Key)
 								end
 							elseif Type=='string' then
