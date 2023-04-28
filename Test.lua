@@ -15,10 +15,11 @@ local t={
 		1/0,--math.huge
 		math.maxinteger,
 		math.mininteger,
+		[math.huge] = -math.huge,
 	},--5
 	nil,
 	'b',
-	D={E={'e',[true]=false,}}
+	D={E={'e',[true]=false,[false]=true}}
 }
 Output=D2S(t)
 --print(Output)
@@ -33,11 +34,13 @@ return {
 		1/0,
 		math.maxinteger,
 		math.mininteger,
+		[1/0]=-1/0,
 	},
 	[7]="b",
 	D={
 		E={
 			"e",
+			[false]=true,
 			[true]=false,
 		},
 	},
@@ -55,6 +58,7 @@ return {
 	D={
 		E={
 			"e",
+			[false]=true,
 			[true]=false,
 		},
 	},
@@ -62,9 +66,9 @@ return {
 
 Output=D2S(t,'compress')--print(Output)
 assert(Output==(Lua_Version>=5.3 and [[--Generated using Data2String2.lua by RobertL
-return {"a",2,false,true,{0/0,1/0,math.maxinteger,math.mininteger},[7]="b",D={E={"e",[true]=false}}}]]
+return {"a",2,false,true,{0/0,1/0,math.maxinteger,math.mininteger,[1/0]=-1/0},[7]="b",D={E={"e",[false]=true,[true]=false}}}]]
 or [[--Generated using Data2String2.lua by RobertL
-return {"a",2,false,true,{0/0,1/0},[7]="b",D={E={"e",[true]=false}}}]]),Output)
+return {"a",2,false,true,{[1]=0/0,[2]=1/0},[7]="b",D={E={"e",[false]=true,[true]=false}}}]]),Output)
 
 Output=D2S(t,'lazy')
 --print(Output)
@@ -79,11 +83,13 @@ return {
 		1/0,
 		math.maxinteger,
 		math.mininteger,
+		[1/0]=-1/0,
 	},
 	[7]="b",
 	D={
 		E={
 			"e",
+			[false]=true,
 			[true]=false,
 		},
 	},
@@ -178,7 +184,9 @@ assert(t6[t6]==t4)
 
 --	string display
 local t={
+	'str',
 	'string',
+	func='func',
 	['function']={
 		"C:\\",
 		['"']="%\t'[[\t]=]",
@@ -188,7 +196,9 @@ Output=D2S(t)
 --print(Output)
 assert(Output==[===[--Generated using Data2String2.lua by RobertL
 return {
+	"str",
 	"string",
+	func="func",
 	["function"]={
 		[[C:\]],
 		[ [["]]]=[==[%	'[[	]=]]==],
