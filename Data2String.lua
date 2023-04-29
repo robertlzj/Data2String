@@ -544,15 +544,12 @@ return ]]
 	Write''--[[place holder]]Body_Index=#Output_List
 	Reference(Data,0,0)
 	
-	if Is_Compress then
-		Output_List[2]=String_Replace(Output_List[2],'[\r\n]+\t*',' ')
-		if next(Tables_Has_Delay_Key) then
-			for Table,Table_ID in pairs(Tables_Has_Delay_Key) do
-				Delay_Write'_['Delay_Write(Table_ID)Delay_Write'][_],'
-			end
-			Delay_Output_List[#Delay_Output_List]='][_]=nil'
-			Delay_Write(Delay_Write_Separator)
+	if Is_Compress and next(Tables_Has_Delay_Key) then
+		for Table,Table_ID in pairs(Tables_Has_Delay_Key) do
+			Delay_Write'_['Delay_Write(Table_ID)Delay_Write'][_],'
 		end
+		Delay_Output_List[#Delay_Output_List]='][_]=nil'
+		Delay_Write(Delay_Write_Separator)
 	end
 	if Configure and Next(Objects) then
 		if Is_Delay_Assign then
@@ -580,7 +577,9 @@ return ]]
 	else
 		Output_List[Delay_Assign_Return_Index]='return '
 	end
-	
+	if Is_Compress then
+		Output_List[2]=String_Replace(Output_List[2],'[\r\n]+\t*',' ')
+	end
 	for Index,Content in ipairs(Delay_Output_List) do
 		Table_Insert(Output_List,Content)
 	end

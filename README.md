@@ -16,8 +16,9 @@ Serialize data Fast in any struct to string. Clear view through complex referenc
 - **Very fast**, see [Performance](#Performance) bellow.
 - Easy to deserialize / restore / load.
 - Support **pretty print** & human **readable** output.
-  - Indent, organized in struct level.  
-    Easy to fold / unfold (expand / collapse) by editor.
+  - Indent, comments, organized in struct level.  
+    Easy to fold / unfold (expand / collapse) by editor.  
+    Less and minimal jump on references in 'normal' mode.
   - Could reuse long string (like other reference object).
     ```lua
     --data:
@@ -41,7 +42,7 @@ Serialize data Fast in any struct to string. Clear view through complex referenc
     All reference are in right place directly, even when nest.
   - String in format without escape, that is, what you get is what you see as display by `print`.  
     When escape character exist, will use `[[C:\]]` instead of `"C:\\"`. So, you can copy-paste then search in output.
-  - Numerical keys are listed first (`{item1, item2, key=value}`).
+  - Numerical and alphabet keys are sorted in 'normal' (not 'compress') model (`{key=value, item1, item2}`).
   - Keep array format instead of index-value pairs (`{'data',2,'string'}`).
   - Use short keys if possible (`{key = 'value', ['do'] = 'end'}`).
 - Support output **configure**, see bellow.
@@ -52,19 +53,23 @@ Serialize data Fast in any struct to string. Clear view through complex referenc
 ## Configure
 ### Mode
 
-- `nil`: default, most readable, load-able.
-- `'compress'`: will compose (un-readable), load-able, fastest on serialize, slower on deserialize.
-- `lazy`: readable, load-able, balance on serialize and deserialize.
-  could combine `compress`, will become un-readable, but could reduce size.
+- `nil`: normal/default, most readable, content sorted, load-able.  
+  Could combine with ‘compress' bellow.
+- `'lazy'`: readable, load-able, faster to deserialize.  
+  Could combine with ‘compress' bellow.
 - `false`: read only (can't load).
   Limitation: currently will fail if there is any self-reference.
+
+---
+
+- `'compress'`: will compose (un-readable), load-able, fastest on serialize and deserialize.
 
 | mode          | readable | serialize speed | deserialize speed |
 | ------------- | -------- | --------------- | ----------------- |
 | default       | 5/5      | 4/5             | 2/5               |
-| compress      | 1/5      | 5/5             | 3/5               |
-| lazy          | 4/5      | 3/5             | 4/5               |
-| lazy compress | 1/5      | 4/5             | 5/5               |
+| compress      | 0/5      | 5/5             | 3/5               |
+| lazy          | 3/5      | 3/5             | 4/5               |
+| lazy compress | 0/5      | 4/5             | 5/5               |
 
 Check [Performance](#Performance).
 
@@ -81,21 +86,21 @@ Check [Performance](#Performance).
 ## Performance
 | serializer                                       | time cost (sec) |
 | :----------------------------------------------- | :-------------- |
-| [serpent](https://github.com/pkulchenko/serpent) | 10.03           |
-| D2S                                              | 5.83            |
-| D2S_compress                                     | 4.74            |
-| D2S_lazy                                         | 6.57            |
-| D2S_lazy_compress                                | 5.61            |
+| [serpent](https://github.com/pkulchenko/serpent) | 8.02            |
+| D2S                                              | 5.54            |
+| D2S_compress                                     | 4.11            |
+| D2S_lazy                                         | 6.20            |
+| D2S_lazy_compress                                | 4.49            |
 
 | deserializer      | time cost (sec) |
 | :---------------- | :-------------- |
 | serpent           | 0.64            |
-| D2S               | 1.44            |
-| D2S_compress      | 1.41            |
-| D2S_lazy          | 0.85            |
-| D2S_lazy_compress | 0.82            |
+| D2S               | 1.42            |
+| D2S_compress      | 1.29            |
+| D2S_lazy          | 0.88            |
+| D2S_lazy_compress | 0.84            |
 
-Test under windows CMD, lua53, test case borrowed from [pkulchenko](https://github.com/pkulchenko)/[serpent](https://github.com/pkulchenko/serpent), iters for 50000.  
+Test under windows CMD, lua53, process with high priority. Test case borrowed from [pkulchenko](https://github.com/pkulchenko)/[serpent](https://github.com/pkulchenko/serpent), iters for 20000.  
 Also test: 
 
 - [Penlight](https://github.com/lunarmodules/Penlight) can't handle self-reference.

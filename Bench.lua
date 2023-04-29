@@ -3,10 +3,16 @@ print"Data2String performance bench"
 
 local socket=require'socket'
 local get_time=socket.gettime
-	and os.clock
+	and os.clock	
 
-local ITERS = ... or 50000
-print("ITERS",ITERS)
+local ITERS = ... or 10000
+print("ITERS:",ITERS)
+
+--print(table.unpack(arg,-2))
+if not arg[-2]--[[execute outside from IDE, index 1 is interpreter]] then
+	os.execute("pause")
+	--	could set process priority then continue.
+end
 
 ---------- test data  ---------
 local b = {text="ha'ns", ['co\nl or']='bl"ue', str="\"\n'\\\001"}
