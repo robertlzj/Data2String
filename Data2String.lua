@@ -61,6 +61,8 @@ local function List_Pairs(Key_Order_List_Set,Table)
 	end
 end--List_Pairs
 
+local Valid_External_Reference_Type={table=true,['function']=true,userdata=true}
+
 local function Data2String(Data,Configure)
 	--[[
 		Configure: default true
@@ -70,12 +72,16 @@ local function Data2String(Data,Configure)
 				equal {C=false}
 				will failed, if self-reference exist
 			table={P=pairs,Paris=pairs,String_Converter=Wrap_String,SC=Wrap_String,Reference_String_If_Longer_Than_Length=10,RS=10}
+			
+			[1]=External_Reference,..
 	]]
 	local Pairs,String_Converter,Comma=P,String_Converter,','--pairs,string convert,comma
 	local RS=10
 	--	Reference_String_If_Longer_Than_Length
 	local SO
 	--	scan only, use internally?
+	
+	local External_Reference_Map,External_Reference_Count={}
 	
 	local Is_Delay_Assign
 	Is_Normal,Is_Compress=true,false
@@ -114,6 +120,15 @@ local function Data2String(Data,Configure)
 			if Configure.C==false then
 				Configure=nil
 			end
+			do
+				for Index,External_Reference in ipairs(Configure) do
+					local External_Reference_Type=type(External_Reference)
+					assert(Valid_External_Reference_Type[External_Reference_Type])
+					External_Reference_Map[External_Reference]=Index--ID
+					External_Reference_Map[Index]=Index
+				end
+				External_Reference_Count=#Configure
+			end
 		else assert(Configure==false,'unhandle Configure')
 			SO=false
 			Comma=''
@@ -131,7 +146,7 @@ local function Data2String(Data,Configure)
 	]]}
 	local function Is_Could_Define_Reference(Target,Target_Type)
 		Target_Type=Target_Type or Get_Type(Target)
-		return Target_Type=='table' or (Is_Normal and Target_Type=='string' and RS and String_Length(Target)>RS)
+		return Target_Type=='table' or External_Reference_Map[Target] or (Is_Normal and Target_Type=='string' and RS and String_Length(Target)>RS)
 	end
 	local Scan do
 		local Parent_Tables=Is_Delay_Assign and {--[[
@@ -178,10 +193,15 @@ local function Data2String(Data,Configure)
 	
 	--generate ID, clean single instance
 	local Assign_ID do
-		local Candidate_ID=1
+		local Candidate_ID=(External_Reference_Count or 0)+1
 		function Assign_ID(Object)
-			local ID=Candidate_ID
-			Candidate_ID=Candidate_ID+1
+			local ID
+			if External_Reference_Map[Object] then
+				ID=External_Reference_Map[Object]
+			else
+				ID=Candidate_ID
+				Candidate_ID=Candidate_ID+1
+			end
 			Objects[Object]=ID
 			return ID
 		end
@@ -190,12 +210,15 @@ local function Data2String(Data,Configure)
 		[ID]=Count
 	]]}
 	for Object,Count in P(Objects) do
-		if Count>1 then
+		if Count>1 or External_Reference_Map[Object] then
 			local ID=Assign_ID(Object)
 			Object_ID_Count[ID]=Count
 		else
 			Objects[Object]=nil
 		end
+	end
+	for Index,ID in ipairs(External_Reference_Map) do
+		Objects[Index]=ID
 	end
 
 	local Output_List={
@@ -217,7 +240,12 @@ local function Data2String(Data,Configure)
 	
 	local Delay_Assign_Declare_Index,Delay_Assign_Return_Index,Body_Index
 	if Configure and Next(Objects) and not Is_Delay_Assign then
-		Write[[local _,Func=setmetatable({},{
+		if External_Reference_Count then
+			Write[[return function(_)
+]]
+		end
+		if #Object_ID_Count>#External_Reference_Map then
+			Write[[local _,Func=setmetatable(_ or {},{
 	__index=function(R,id) R[id]={} return R[id] end,
 	__call=function(R,id,t)
 		if rawget(R,id) and assert(type(t)=='table') then
@@ -231,6 +259,9 @@ local function Data2String(Data,Configure)
 	end,
 }),error
 return ]]
+		else assert(#Object_ID_Count==#External_Reference_Map)
+			Write[[return ]]
+		end
 	else
 		Write''--[[place holder]]Delay_Assign_Declare_Index=#Output_List
 		Write''--[[place holder]]Delay_Assign_Return_Index=#Output_List
@@ -431,6 +462,7 @@ return ]]
 		end
 		local Register_Cost_Count=register_cost_count
 		local Converted_Input=Input_Converter[Input]
+			or (External_Reference_Map[Input] and ('_['..External_Reference_Map[Input]..']'))
 		if Converted_Input then
 			Write(Converted_Input)
 		elseif Input_Type=='string' then
@@ -497,6 +529,8 @@ return ]]
 								Table_Insert(String_Key_List,Key)
 							elseif Key_Type=='table' then
 								Table_Key_Set[Key]=Value
+							elseif External_Reference_Map[Key] then
+								Table_Key_Set[Key]=Value
 							else assert(Key_Type=='boolean','unhandle type '..Key_Type)
 							end
 						end
@@ -553,13 +587,26 @@ return ]]
 	end
 	if Configure and Next(Objects) then
 		if Is_Delay_Assign then
-			Output_List[Delay_Assign_Declare_Index]=[[local _,Func=setmetatable({},{
+			local Delay_Assign_Declare_List={}
+			if External_Reference_Count then
+				Delay_Assign_Declare_List=[[return function(_)
+local _,Func=setmetatable(_,{
 	__call=function(R,id,t)
 		R[id]=t
 		return t
 	end,
 }),error
 ]]
+			else
+				Delay_Assign_Declare_List=[[local _,Func=setmetatable({},{
+	__call=function(R,id,t)
+		R[id]=t
+		return t
+	end,
+}),error
+]]
+			end
+			Output_List[Delay_Assign_Declare_Index]=Delay_Assign_Declare_List
 			if #Delay_Output_List>0 then
 				local Body_Id
 				if not Objects[Data] then
@@ -582,6 +629,9 @@ return ]]
 	end
 	for Index,Content in ipairs(Delay_Output_List) do
 		Table_Insert(Output_List,Content)
+	end
+	if External_Reference_Count then
+		Write[[end]]
 	end
 	return Concat_Table(Output_List)
 end--Data2String

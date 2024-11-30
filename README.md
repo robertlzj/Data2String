@@ -7,6 +7,7 @@ May Lua world become better and better.
 Serialize data Fast in any struct to string. Clear view through complex reference.
 - "serialize": a serializer support convert / store ..
 - "data": include 'nil', 'NaN', 'number' (also number from `math`), 'bool', 'string', 'table', 'funtion' type.
+- "external": support refer/link external data - 'table', 'function', 'userdata'.
 - "in any struct": support table with nest, self-reference, circle-reference (circular-reference).
 - "to string": the output is a normal lua code (string) which could be `load` to deserialize / restore to the data.
 - "clear view": keep the original structure, easy to navigate between references. Expanded bellow.
@@ -45,6 +46,8 @@ Serialize data Fast in any struct to string. Clear view through complex referenc
   - Numerical and alphabet keys are sorted in 'normal' (not 'compress') model (`{key=value, item1, item2}`).
   - Keep array format instead of index-value pairs (`{'data',2,'string'}`).
   - Use short keys if possible (`{key = 'value', ['do'] = 'end'}`).
+- Support refer/link to **external data**, which won't be serialized internally to the file.
+  These data could easily be declared by configure, then they should be stored and restored from outside.
 - Support output **configure**, see bellow.
 - Short, write in pure Lua, easy to read, support 5.1, 5.3.
 - Workaround registers max count limitation used in function or expression when load.   
@@ -194,10 +197,20 @@ see 'Test.lua'
   t3=assert(load(Output),Output)()
   assert(t3.T1.T2==t3 and t3[t3]=='T1')
   ```
+- external refer
+  ```lua
+  e={}
+  function f()end
+  t={[e]=e,F=f}
+  Output=D2S(t,{e,f})
+  --print(Output)
+  R=assert(load(Output),Output)(){e,f}
+  assert(R[e]==e and R.F==f)
+  ```
 
 ## Limitations/TODO
 - doesn't support metatable, could be done.
-- doesn't support external data import, could be done.
+- [x] doesn't support external data import, could be done.
 - Lua 5.2 test didn't all pass, not sure why.
 
 ### Done

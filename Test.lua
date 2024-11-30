@@ -245,4 +245,17 @@ do--register limit
 	assert(R[50+50][50][50][50][50][2]==2)
 end
 
+do--external reference
+	local E1={}
+	local function F()end
+	local I={}
+	local t={[E1]=E1,E=E1,[F]=F,I=I,[I]=I}
+	local Output=D2S(t,{E1,F,
+--		Lazy=true,--enable or disable
+	})
+--	print(Output)
+	local R=assert(load(Output),Output)(){E1,F}
+	assert(R.E==E1 and R[E1]==E1 and R[F]==F and R[R.I]==R.I,Output)
+end
+
 print"finish"
