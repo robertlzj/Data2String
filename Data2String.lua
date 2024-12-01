@@ -146,7 +146,7 @@ local function Data2String(Data,Configure)
 	]]}
 	local function Is_Could_Define_Reference(Target,Target_Type)
 		Target_Type=Target_Type or Get_Type(Target)
-		return Target_Type=='table' or External_Reference_Map[Target] or (Is_Normal and Target_Type=='string' and RS and String_Length(Target)>RS)
+		return Target_Type=='table' or ((Target_Type=='function' or Target_Type=='userdata') or External_Reference_Map[Target]) or (Is_Normal and Target_Type=='string' and RS and String_Length(Target)>RS)
 	end
 	local Scan do
 		local Parent_Tables=Is_Delay_Assign and {--[[
@@ -222,7 +222,7 @@ local function Data2String(Data,Configure)
 	end
 
 	local Output_List={
-		'--Generated using Data2String2.lua by RobertL\n',
+		'--Generated using Data2String.lua by RobertL\n',
 	}
 	local LE--append on line end (comment of index)
 	local Newline='\n'
@@ -462,7 +462,6 @@ return ]]
 		end
 		local Register_Cost_Count=register_cost_count
 		local Converted_Input=Input_Converter[Input]
-			or (External_Reference_Map[Input] and ('_['..External_Reference_Map[Input]..']'))
 		if Converted_Input then
 			Write(Converted_Input)
 		elseif Input_Type=='string' then

@@ -21,7 +21,7 @@ do-- basic (without reference) pretty output
 	}
 	local Output=D2S(t)
 	--print(Output)
-	assert(Output==(Lua_Version>=5.3 and [[--Generated using Data2String2.lua by RobertL
+	assert(Output==(Lua_Version>=5.3 and [[--Generated using Data2String.lua by RobertL
 return {
 	[7]="b",
 	D={
@@ -42,7 +42,7 @@ return {
 		math.maxinteger,
 		math.mininteger,
 	},
-}]] or [[--Generated using Data2String2.lua by RobertL
+}]] or [[--Generated using Data2String.lua by RobertL
 return {
 	[7]="b",
 	D={
@@ -63,14 +63,14 @@ return {
 }]]),Output)
 
 	Output=D2S(t,'compress')--print(Output)
-	assert(Output==(Lua_Version>=5.3 and [[--Generated using Data2String2.lua by RobertL
+	assert(Output==(Lua_Version>=5.3 and [[--Generated using Data2String.lua by RobertL
 return {[7]="b",D={E={[false]=true,[true]=false,"e"}},"a",2,false,true,{[1/0]=-1/0,0/0,1/0,math.maxinteger,math.mininteger}}]]
-	or [[--Generated using Data2String2.lua by RobertL
+	or [[--Generated using Data2String.lua by RobertL
 return {[7]="b",D={E={[false]=true,[true]=false,"e"}},"a",2,false,true,{[1]=0/0,[2]=1/0}}]]),Output)
 
 	Output=D2S(t,'lazy')
 	--print(Output)
-	assert(string.find(Output,[=[--Generated using Data2String2.lua by RobertL
+	assert(string.find(Output,[=[--Generated using Data2String.lua by RobertL
 return {
 	[7]="b",
 	D={
@@ -110,7 +110,7 @@ do--long string reference
 }]=],1,true),Output)
 	Output=D2S(t,'lazy')
 	--print(Output)
-	assert(string.find(Output,[=[--Generated using Data2String2.lua by RobertL
+	assert(string.find(Output,[=[--Generated using Data2String.lua by RobertL
 local _,Func=setmetatable({},{
 	__call=function(R,id,t)
 		R[id]=t
@@ -197,7 +197,7 @@ do--	string display
 	}
 	local Output=D2S(t)
 	--print(Output)
-	assert(Output==[===[--Generated using Data2String2.lua by RobertL
+	assert(Output==[===[--Generated using Data2String.lua by RobertL
 return {
 	func="func",
 	["function"]={
