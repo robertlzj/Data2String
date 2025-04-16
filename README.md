@@ -1,8 +1,3 @@
-One for all, all for one.
-May Lua world become better and better.
-
----
-
 ## Summary
 Serialize data Fast in any struct to string. Clear view through complex reference.
 - "serialize": a serializer support convert / store ..
@@ -61,6 +56,7 @@ Serialize data Fast in any struct to string. Clear view through complex referenc
 - `'lazy'`: readable, load-able, faster to deserialize.  
   Could combine with ‘compress' bellow.
 - `false`: read only (can't load).
+  Support output 'userdata', 'thread' string using `tostring`.
   Limitation: currently will fail if there is any self-reference.
 
 ---

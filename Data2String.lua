@@ -464,8 +464,11 @@ return ]]
 		local Converted_Input=Input_Converter[Input]
 		if Converted_Input then
 			Write(Converted_Input)
-		elseif Input_Type=='string' then
-			local Converted_String,Prefix,Postfix=String_Converter(Input)
+		elseif Input_Type=='string'
+			or (Configure==nil--[[format for read only (can't load)]] and 
+				(Input_Type=='userdata' or Input_Type=='thread')
+			) then
+			local Converted_String,Prefix,Postfix=String_Converter(Input_Type=='string' and Input or tostring(Input))
 			if Need_Break_Sequent_Open_Bracket then
 				Need_Break_Sequent_Open_Bracket=false
 				if Output_List[#Output_List]=='[' and String_Sub(Prefix or Converted_String,1,1)=='[' then
