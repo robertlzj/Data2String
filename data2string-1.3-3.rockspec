@@ -1,8 +1,8 @@
 package = "Data2String"
-version = "1.3-2"
+version = "1.3-3"
 source = {
    url = "git+https://github.com/robertlzj/Data2String",
-   tag = "v1.3.2",
+   tag = "v1.3.3",
 }
 description = {
    summary = "Serialize data Fast in any struct to string. Clear view through complex reference.",
